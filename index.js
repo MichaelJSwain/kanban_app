@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const User = require("./models/user");
+const Todo = require("./models/todo").model;
 const bcrypt = require("bcrypt");
 
 const mongoose = require("mongoose");
@@ -130,8 +131,21 @@ app.get("/kanban/user/:id/todos", async (req, res) => {
 });
 
 // create
-app.post("/kanban/user/:id/todos", (req, res) => {
-    res.send("todos create endpoint");
+app.post("/kanban/user/:id/todos", async (req, res) => {
+    try {
+        const foundUser = await User.findById(req.params.id);
+        if (!foundUser) {
+            return res.status(500).json({success: false, message: "unable to save todo"});
+        }
+
+        const todo = new Todo(req.body);
+        foundUser.todos.push(todo);
+        
+        const user = await foundUser.save();
+        return res.status(200).json({success: true, data: {"todos": user.todos}});
+    } catch(e) {
+        return res.status(500).json({success: false, message: "unable to save todo"});
+    }
 });
 
 // show
