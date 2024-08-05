@@ -149,8 +149,23 @@ app.post("/kanban/user/:id/todos", async (req, res) => {
 });
 
 // show
-app.get("/kanban/user/:id/todos/:todoId", (req, res) => {
-    res.send("todos show endpoint");
+app.get("/kanban/user/:id/todos/:todoId", async (req, res) => {
+    console.log("todos show endpoint");
+    try {
+        const foundUser = await User.findById(req.params.id).populate("todos");
+        if (!foundUser) {
+            return res.status(500).json({success: false, message: "unable to save todo"});
+        }
+        console.log(foundUser);
+        foundUser.todos.forEach(todo => {
+            if (String(todo._id) === req.params.todoId) {
+                return res.status(200).json({success: true, data: {"todo": todo}});
+            }
+        })
+        return res.status(500).json({success: false, message: "unable to find todo"});
+    } catch(e) {
+        return res.status(500).json({success: false, message: "unable to find todo"});
+    }
 });
 
 // update
