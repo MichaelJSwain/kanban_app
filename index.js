@@ -61,13 +61,6 @@ app.post("/kanban/user/login", async (req, res) => {
 
 // Register
 app.post("/kanban/user/register", (req, res) => {
-    // res.send("user register endpoint");
-    // check if valid email, username, password values in middleware
-        // if valid, next()
-        // else return error message
-    // hash password
-    // create new instance of User with hashed password
-    // save()
     console.log(req.body);
 
     let errorObj = {};
@@ -116,8 +109,24 @@ app.post("/kanban/user/register", (req, res) => {
 
 // ---- Todo item endpoints ---- //
 // index
-app.get("/kanban/user/:id/todos", (req, res) => {
-    res.send("todos index endpoint");
+app.get("/kanban/user/:id/todos", async (req, res) => {
+    const userId = req.params.id;
+    if (!userId) {
+        return res.status(500).json({success: false, message: "no user found"});
+    }
+
+    try {
+        const user = await User.findById(userId).populate("todos");
+        if (!user) {
+            return res.status(500).json({success: false, message: "no user found"});
+        }
+           
+        return res.status(200).json({success: true, data: {"todos": user.todos}});
+    } catch(e) {
+        return res.status(500).json({success: false, message: "no user found"});
+    }
+  
+ 
 });
 
 // create
