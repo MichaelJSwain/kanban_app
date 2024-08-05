@@ -42,13 +42,13 @@ app.post("/kanban/user/login", async (req, res) => {
         const foundUser = await User.findOne({username});
         
         if (!foundUser) {
-            return res.status(500).send("Incorrect username or password");
+            return res.status(500).json({success: false, message: "Incorrect username or password"});
         } else {
             bcrypt.compare(password, foundUser.password).then(function(result) {
                 if (result) {
-                    res.status(200).json({success: true, data: {user: foundUser}});
+                   return res.status(200).json({success: true, data: {user: foundUser}});
                 } else {
-                    res.status(500).json({success: false, message: "Incorrect username or password"});
+                   return res.status(500).json({success: false, message: "Incorrect username or password"});
                 }
             });
         }
@@ -83,7 +83,7 @@ app.post("/kanban/user/register", (req, res) => {
     }
 
     if (Object.keys(errorObj).length) {
-        return res.send(errorObj);
+        return res.status(500).json({success: false, message: errorObj});
     }
 
     console.log("storing user in db");
@@ -102,14 +102,14 @@ app.post("/kanban/user/register", (req, res) => {
 
             try {
                 const user = await newUser.save();
-                res.status(200).send(user);
+                return res.status(200).json({success: true, data: {user}});
             } catch(e) {
-                res.status(500).send("error saving user to db");
+                return res.status(500).json({success: false, message: "error saving user to db"});
             }
             
         })
         .catch(e => {
-            console.log("error hashing password = ", e);
+            return res.status(500).json({success: false, message: "error saving user to db"});
         });
 });
 
