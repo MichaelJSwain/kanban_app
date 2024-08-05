@@ -11,9 +11,46 @@ db.once("open", () => {
 
 const PORT = 4040;
 
-app.get("/", (req, res) => {
-    res.send("Welcome!")
+// ---- User endpoints ---- //
+
+// Login
+app.post("/kanban/user/login", (req, res) => {
+    res.send("user login endpoint");
 });
+
+// Register
+app.post("/kanban/user/register", (req, res) => {
+    res.send("user register endpoint");
+});
+
+
+// ---- Todo item endpoints ---- //
+// index
+app.get("/kanban/user/:id/todos", (req, res) => {
+    res.send("todos index endpoint");
+});
+
+// create
+app.post("/kanban/user/:id/todos", (req, res) => {
+    res.send("todos create endpoint");
+});
+
+// show
+app.get("/kanban/user/:id/todos/:todoId", (req, res) => {
+    res.send("todos show endpoint");
+});
+
+// update
+app.put("/kanban/user/:id/todos/:todoId", (req, res) => {
+    res.send("todos update endpoint");
+});
+
+// delete
+app.delete("/kanban/user/:id/todos/:todoId", (req, res) => {
+    res.send("todos delete endpoint");
+});
+
+// create - get all todos for a user
 
 app.listen(PORT, () => {
     console.log("app listening on port ", PORT);
