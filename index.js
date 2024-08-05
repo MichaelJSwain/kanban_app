@@ -3,6 +3,7 @@ const app = express();
 const User = require("./models/user");
 const Todo = require("./models/todo").model;
 const bcrypt = require("bcrypt");
+require('dotenv').config()
 
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost:27017/kanban-app");
@@ -13,7 +14,7 @@ db.once("open", () => {
     console.log("Database connected!!");
 });
 
-const PORT = 4040;
+const PORT = process.env.PORT || 4040;
 
 app.use(express.json());
 
