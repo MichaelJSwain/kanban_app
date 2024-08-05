@@ -198,8 +198,19 @@ app.put("/kanban/user/:id/todos/:todoId", async (req, res) => {
 });
 
 // delete
-app.delete("/kanban/user/:id/todos/:todoId", (req, res) => {
-    res.send("todos delete endpoint");
+app.delete("/kanban/user/:id/todos/:todoId", async (req, res) => {
+    console.log("todos delete endpoint");
+
+    const {id, todoId} = req.params;
+    const mongooseId = new mongoose.Types.ObjectId(todoId);
+
+    try {
+        await User.findByIdAndUpdate(id, {$pull: {todos: {_id: mongooseId}}});
+        
+        return res.status(200).json({success: true, message: "successfully deleted todo"});
+    } catch(e) {
+        return res.status(500).json({success: false, message: "failed to delete todo"});
+    }
 });
 
 // create - get all todos for a user
