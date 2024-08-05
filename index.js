@@ -169,8 +169,32 @@ app.get("/kanban/user/:id/todos/:todoId", async (req, res) => {
 });
 
 // update
-app.put("/kanban/user/:id/todos/:todoId", (req, res) => {
-    res.send("todos update endpoint");
+app.put("/kanban/user/:id/todos/:todoId", async (req, res) => {
+    const {todoId} = req.params;
+    const mongooseId = new mongoose.Types.ObjectId(todoId);
+    const {title, description, stage} = req.body;
+
+    try {
+        const updatedUser = await User.updateOne({
+            "todos._id": mongooseId
+        }, {
+            "$set": {
+                "todos.$.title": title,
+                "todos.$.description": description,
+                "todos.$.stage": stage
+              }
+        }, {
+           "new": true
+        });
+        return res.status(200).json({success: true, data: {user: updatedUser}});
+    } catch(e) {
+        console.log("error fetching todo");
+        return res.status(500).json({success: false, message: "failed to update todo"});
+    }
+    
+    /* 
+
+    */
 });
 
 // delete

@@ -6,7 +6,12 @@ const userSchema = new Schema({
     email: String,
     username: String,
     password: String,
-    todos: [Todo]
+    todos: [{
+        title: String,
+        description: String,
+        stage: String,
+        deadline: Date
+    }]
 });
 
 const User = mongoose.model("User", userSchema);
