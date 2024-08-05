@@ -19,8 +19,44 @@ app.use(express.json());
 // ---- User endpoints ---- //
 
 // Login
-app.post("/kanban/user/login", (req, res) => {
-    res.send("user login endpoint");
+app.post("/kanban/user/login", async (req, res) => {
+    console.log("user login endpoint");
+
+    const {username, password} = req.body;
+
+    let errorObj = {};
+
+    if (!username) {
+        errorObj.username = "please enter a valid username";
+    }
+    if (!password) {
+        errorObj.password = "please enter a valid password";
+    }
+
+    if (Object.keys(errorObj).length) {
+        return res.send(errorObj);
+    }
+
+    try {
+        console.log(username);
+        const foundUser = await User.findOne({username});
+        
+        if (!foundUser) {
+            return res.status(500).send("Incorrect username or password");
+        } else {
+            bcrypt.compare(password, foundUser.password).then(function(result) {
+                if (result) {
+                    res.status(200).json({success: true, data: {user: foundUser}});
+                } else {
+                    res.status(500).json({success: false, message: "Incorrect username or password"});
+                }
+            });
+        }
+    } catch(e) {
+        console.log("error trying to find user = ", e);
+    }
+
+
 });
 
 // Register
