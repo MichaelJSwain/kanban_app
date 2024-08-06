@@ -4,6 +4,7 @@ const User = require("./models/user");
 const Todo = require("./models/todo").model;
 const bcrypt = require("bcrypt");
 require('dotenv').config()
+const cors = require('cors');
 
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost:27017/kanban-app");
@@ -15,6 +16,8 @@ db.once("open", () => {
 });
 
 const PORT = process.env.PORT || 4040;
+
+app.use(cors({origin: `http://localhost:5173`}))
 
 app.use(express.json());
 
@@ -48,7 +51,7 @@ app.post("/kanban/user/login", async (req, res) => {
         } else {
             bcrypt.compare(password, foundUser.password).then(function(result) {
                 if (result) {
-                   return res.status(200).json({success: true, data: {user: foundUser}});
+                   return res.status(200).json({success: true, user: foundUser});
                 } else {
                    return res.status(500).json({success: false, message: "Incorrect username or password"});
                 }
@@ -97,7 +100,7 @@ app.post("/kanban/user/register", (req, res) => {
 
             try {
                 const user = await newUser.save();
-                return res.status(200).json({success: true, data: {user}});
+                return res.status(200).json({success: true, user});
             } catch(e) {
                 return res.status(500).json({success: false, message: "error saving user to db"});
             }
@@ -123,7 +126,7 @@ app.get("/kanban/user/:id/todos", async (req, res) => {
             return res.status(500).json({success: false, message: "no user found"});
         }
            
-        return res.status(200).json({success: true, data: {"todos": user.todos}});
+        return res.status(200).json({success: true, todos: user.todos});
     } catch(e) {
         return res.status(500).json({success: false, message: "no user found"});
     }
@@ -143,7 +146,7 @@ app.post("/kanban/user/:id/todos", async (req, res) => {
         foundUser.todos.push(todo);
         
         const user = await foundUser.save();
-        return res.status(200).json({success: true, data: {"todos": user.todos}});
+        return res.status(200).json({success: true, todos: user.todos});
     } catch(e) {
         return res.status(500).json({success: false, message: "unable to save todo"});
     }
@@ -160,7 +163,7 @@ app.get("/kanban/user/:id/todos/:todoId", async (req, res) => {
         console.log(foundUser);
         foundUser.todos.forEach(todo => {
             if (String(todo._id) === req.params.todoId) {
-                return res.status(200).json({success: true, data: {"todo": todo}});
+                return res.status(200).json({success: true, todos: user.todos});
             }
         })
         return res.status(500).json({success: false, message: "unable to find todo"});
@@ -187,7 +190,7 @@ app.put("/kanban/user/:id/todos/:todoId", async (req, res) => {
         }, {
            "new": true
         });
-        return res.status(200).json({success: true, data: {user: updatedUser}});
+        return res.status(200).json({success: true, user: updatedUser});
     } catch(e) {
         console.log("error fetching todo");
         return res.status(500).json({success: false, message: "failed to update todo"});
