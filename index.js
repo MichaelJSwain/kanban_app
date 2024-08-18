@@ -25,8 +25,6 @@ app.use(express.json());
 
 // Login
 app.post("/kanban/user/login", async (req, res) => {
-    console.log("user login endpoint");
-
     const {username, password} = req.body;
 
     let errorObj = {};
@@ -43,7 +41,6 @@ app.post("/kanban/user/login", async (req, res) => {
     }
 
     try {
-        console.log(username);
         const foundUser = await User.findOne({username});
         
         if (!foundUser) {
@@ -58,7 +55,7 @@ app.post("/kanban/user/login", async (req, res) => {
             });
         }
     } catch(e) {
-        console.log("error trying to find user = ", e);
+        return res.status(500).json({success: false, message: "Error trying to login. Please try again later"});
     }
 
 
@@ -66,8 +63,6 @@ app.post("/kanban/user/login", async (req, res) => {
 
 // Register
 app.post("/kanban/user/register", (req, res) => {
-    console.log(req.body);
-
     let errorObj = {};
 
     if (!req.body.email) {
@@ -84,13 +79,9 @@ app.post("/kanban/user/register", (req, res) => {
         return res.status(500).json({success: false, message: errorObj});
     }
 
-    console.log("storing user in db");
-
     bcrypt.hash(req.body.password, 12)
         .then( async (hash) => {
         // Store hash in your password DB.
-            console.log("hashed password = ", hash);
-
             const newUser = new User({
                 email: req.body.email,
                 username: req.body.username,
@@ -146,7 +137,7 @@ app.post("/kanban/user/:id/todos", async (req, res) => {
         foundUser.todos.push(todo);
         
         const user = await foundUser.save();
-        return res.status(200).json({success: true, todos: user.todos});
+        return res.status(200).json({success: true, todo});
     } catch(e) {
         return res.status(500).json({success: false, message: "unable to save todo"});
     }
@@ -154,13 +145,11 @@ app.post("/kanban/user/:id/todos", async (req, res) => {
 
 // show
 app.get("/kanban/user/:id/todos/:todoId", async (req, res) => {
-    console.log("todos show endpoint");
     try {
         const foundUser = await User.findById(req.params.id).populate("todos");
         if (!foundUser) {
             return res.status(500).json({success: false, message: "unable to save todo"});
         }
-        console.log(foundUser);
         foundUser.todos.forEach(todo => {
             if (String(todo._id) === req.params.todoId) {
                 return res.status(200).json({success: true, todos: user.todos});
@@ -192,19 +181,12 @@ app.put("/kanban/user/:id/todos/:todoId", async (req, res) => {
         });
         return res.status(200).json({success: true, user: updatedUser});
     } catch(e) {
-        console.log("error fetching todo");
         return res.status(500).json({success: false, message: "failed to update todo"});
     }
-    
-    /* 
-
-    */
 });
 
 // delete
 app.delete("/kanban/user/:id/todos/:todoId", async (req, res) => {
-    console.log("todos delete endpoint");
-
     const {id, todoId} = req.params;
     const mongooseId = new mongoose.Types.ObjectId(todoId);
 
