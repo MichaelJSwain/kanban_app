@@ -19,7 +19,7 @@ db.once("open", () => {
 
 const PORT = process.env.PORT || 4040;
 
-app.use(cors({origin: `http://localhost:5173`}))
+app.use(cors({origin: `https://66c183d9d0dc7024fdd12c75--remarkable-biscuit-393d21.netlify.app`}))
 
 app.use(express.json());
 
