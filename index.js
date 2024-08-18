@@ -6,8 +6,10 @@ const bcrypt = require("bcrypt");
 require('dotenv').config()
 const cors = require('cors');
 
+const connString = process.env.CONN_STRING;
+
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/kanban-app");
+mongoose.connect(connString);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connect error:"));
