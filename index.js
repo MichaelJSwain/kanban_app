@@ -204,5 +204,5 @@ app.delete("/kanban/user/:id/todos/:todoId", async (req, res) => {
 // create - get all todos for a user
 
 app.listen(PORT, () => {
-    console.log("app listening on port ", PORT);
+    console.log("app listening on port =", PORT);
 });
